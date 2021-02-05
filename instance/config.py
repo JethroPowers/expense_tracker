@@ -7,6 +7,8 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET = os.getenv('SECRET')
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    DEFAULT_PAGINATION_LIMIT = 5
+    MAXIMUM_PAGINATION_LIMIT = 100
 
 
 class DevelopmentConfig(Config):
@@ -17,7 +19,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing, with a separate test database."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_tracker_db'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:powers17@localhost/test_tracker_db'
     DEBUG = True
 
 class StagingConfig(Config):

@@ -4,15 +4,15 @@ from flask import request, jsonify, abort, make_response, url_for
 import datetime
 from sqlalchemy.sql import operators, extract, func
 from instance.config import app_config, Config
+import os
 
-print('app_config', app_config)
 # initialize sql-alchemy
 db = SQLAlchemy()
 
 
 def create_app(config_name):
     app = FlaskAPI(__name__, instance_relative_config=True)
-    print('config_name = ', config_name)
+
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config.from_object(app_config[config_name])
@@ -342,7 +342,7 @@ def create_app(config_name):
                     .group_by(ExpenseTracker.date_of_expense)\
                     .order_by(ExpenseTracker.date_of_expense.desc())\
                     .all()
-                print(expenses)
+
                 #
                 # results = dict()
                 # for expense in expenses:
@@ -369,7 +369,7 @@ def create_app(config_name):
                     'consolidated_total': consolidated_total
                 })), 200
 
-    @app.route('/year_report', methods=['GET'])
+    @app.route('/yearly_report', methods=['GET'])
     def year_expense():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
@@ -402,7 +402,7 @@ def create_app(config_name):
                     .filter(extract('year', ExpenseTracker.date_of_expense) == date.year) \
                     .group_by(extract('year', ExpenseTracker.date_of_expense), extract('month', ExpenseTracker.date_of_expense)) \
                     .all()
-                # print(expenses)
+
 
                 consolidated_total = 0.0
                 results = []

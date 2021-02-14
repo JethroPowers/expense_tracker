@@ -1,0 +1,39 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"      # current default Python on Travis CI
+  - "3.7"
+  - "3.8"
+  - "3.9"
+  - "3.9-dev"  # 3.9 development branch
+  - "nightly"  # nightly build
+
+# Add any extra services that travis can use
+services:
+  - postgresql
+
+# Add environment variables
+env:
+  global:
+    - FLASK_APP=run.py
+    - SECRET=theboythatwentaway
+    - APP_SETTINGS=testing
+    - DATABASE_URL=postgresql://localhost/test_db
+
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+
+# Commands run before running scipt command
+before_script:
+  - psql -c 'create database test_db;' -U postgres
+
+# command to run tests
+script:
+  - coverage run manage.py test
+
+# Commands run after the script command
+after_success:
+  coveralls

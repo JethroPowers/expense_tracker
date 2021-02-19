@@ -196,6 +196,10 @@ class TrackerTestCase(unittest.TestCase):
         rv = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=
         {'name': 'soda', 'amount': 200, 'date_of_expense': '10-01-2021'})
         self.assertEqual(rv.status_code, 201)
+        fetch = self.client().get('/expenses?name=soda', headers=dict(Authorization="Bearer " + access_token))
+        result = json.loads(fetch.data)
+        print('Fetching soda')
+        print(result)
         consolidated_total = 212.23
         res = self.client().get('/monthly_report?month=01-2021', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)

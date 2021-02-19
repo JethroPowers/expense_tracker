@@ -342,6 +342,7 @@ def create_app(config_name):
                     .group_by(ExpenseTracker.date_of_expense)\
                     .order_by(ExpenseTracker.date_of_expense.desc())\
                     .all()
+                print(expenses)
 
                 #
                 # results = dict()
@@ -363,7 +364,7 @@ def create_app(config_name):
                         'total_expenses': total_amount
                     }
                     results.append(obj)
-
+                print(consolidated_total)
                 return make_response(jsonify({
                     'items': results,
                     'consolidated_total': consolidated_total

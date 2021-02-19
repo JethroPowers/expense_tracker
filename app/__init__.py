@@ -16,6 +16,8 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config.from_object(app_config[config_name])
+    # for removing trailing slashes enforcement
+    app.url_map.strict_slashes = False
 
     db.init_app(app)
 
@@ -88,7 +90,7 @@ def create_app(config_name):
 
                         return response
 
-                    expense = ExpenseTracker(name=name, amount=amount_num, date_of_expense=date_of_expense,
+                    expense = ExpenseTracker(name=name, amount=amount_num, date_of_expense=date,
                                              belongs_to=user_id)
                     expense.save()
                     response = jsonify({

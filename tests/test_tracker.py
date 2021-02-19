@@ -196,7 +196,7 @@ class TrackerTestCase(unittest.TestCase):
         rv = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=
         {'name': 'soda', 'amount': 200, 'date_of_expense': '10-01-2021'})
         self.assertEqual(rv.status_code, 201)
-        fetch = self.client().get('/expenses/?name=soda', headers=dict(Authorization="Bearer " + access_token))
+        fetch = self.client().get('/expenses?name=soda', headers=dict(Authorization="Bearer " + access_token))
         result = json.loads(fetch.data)
         print('Fetching soda')
         print(result)

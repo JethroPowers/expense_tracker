@@ -262,21 +262,21 @@ def create_app(config_name):
                             date = datetime.datetime.strptime(date_of_expense, '%d-%m-%Y')
                         except ValueError:
                             response = jsonify({
-                                'message': f'The date {date_of_expense} does not match the format DD-MM=YYYY',
+                                'message': f'The date {date_of_expense} does not match the format DD-MM-YYYY',
                                 'status': 'error'
                             })
                             response.status_code = 400
 
                             return response
-                        expense.date_of_expense = date_of_expense
+                        expense.date_of_expense = date
                     if name:
                         expense.name = name
                     else:
                         response = jsonify({
-                            'message': 'Please enter a expense name',
+                            'message': 'PLease enter a valid name',
                             'status': 'error'
                         })
-                        response.status_code = 404
+                        response.status_code = 400
                         return response
 
                     expense.save()
@@ -344,7 +344,7 @@ def create_app(config_name):
                     .group_by(ExpenseTracker.date_of_expense)\
                     .order_by(ExpenseTracker.date_of_expense.desc())\
                     .all()
-                print(expenses)
+
 
                 #
                 # results = dict()
@@ -366,7 +366,7 @@ def create_app(config_name):
                         'total_expenses': total_amount
                     }
                     results.append(obj)
-                print(consolidated_total)
+
                 return make_response(jsonify({
                     'items': results,
                     'consolidated_total': consolidated_total

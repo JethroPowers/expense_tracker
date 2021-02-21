@@ -43,13 +43,110 @@ class TrackerTestCase(unittest.TestCase):
         """Test API can create a Tracker (POST request)"""
         self.register_user()
         result = self.login_user()
-
         access_token = json.loads(result.data.decode())['access_token']
-
         res = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=self.expense)
         self.assertEqual(res.status_code, 201)
         results = json.loads(res.data)
         self.assertEqual('snacks', results['name'])
+
+    def test_auth_header_is_None(self):
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().post('/expenses/', data=self.expense)
+        self.assertEqual(res.status_code, 401)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'Authorization header missing')
+
+    def test_missing_bearer_token(self):
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().post('/expenses/', headers=dict(Authorization=""), data=self.expense)
+        self.assertEqual(res.status_code, 401)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'Please insert Bearer token')
+
+    def test_missing_bearer_keyword(self):
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().post('/expenses/', headers=dict(Authorization=access_token), data=self.expense)
+        self.assertEqual(res.status_code, 401)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'Authorization token should start with keyword Bearer')
+
+    def test_invalid_amount(self):
+        """Test API can create a Tracker (POST request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=
+        {'name': 'soda', 'amount': 'cazc', 'date_of_expense': '10-01-2021'})
+        self.assertEqual(res.status_code, 400)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'the amount entered is not a valid number')
+
+    def test_invalid_date(self):
+        """Test API can create a Tracker (POST request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=
+        {'name': 'soda', 'amount': 1233, 'date_of_expense': 'fgjfj'})
+        self.assertEqual(res.status_code, 400)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'The date fgjfj does not match the format DD-MM-YYYY')
+
+    def test_no_name(self):
+        """Test API can create a Tracker (POST request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=
+        {'name': '', 'amount': 1233, 'date_of_expense': '10-01-2021'})
+        self.assertEqual(res.status_code, 400)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'PLease enter a valid name')
+
+    def test_invalid_amount_PUT(self):
+        """Test API can create a Tracker (POST request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        rv = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=self.expense)
+        self.assertEqual(rv.status_code, 201)
+        res = self.client().put('/expenses/1', headers=dict(Authorization="Bearer " + access_token), data=
+        {'name': 'soda', 'amount': 'cazc', 'date_of_expense': '10-01-2021'})
+        self.assertEqual(res.status_code, 400)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'the amount entered is not a valid number')
+
+    def test_invalid_date_PUT(self):
+        """Test API can create a Tracker (POST request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        rv = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=self.expense)
+        self.assertEqual(rv.status_code, 201)
+        res = self.client().put('/expenses/1', headers=dict(Authorization="Bearer " + access_token), data=
+        {'name': 'soda', 'amount': 1233, 'date_of_expense': 'fgjfj'})
+        self.assertEqual(res.status_code, 400)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'The date fgjfj does not match the format DD-MM-YYYY')
+
+    def test_no_name_PUT(self):
+        """Test API can create a Tracker (POST request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        rv = self.client().post('/expenses/', headers=dict(Authorization="Bearer " + access_token), data=self.expense)
+        self.assertEqual(rv.status_code, 201)
+        res = self.client().put('/expenses/1', headers=dict(Authorization="Bearer " + access_token), data=
+        {'name': ''})
+        self.assertEqual(res.status_code, 400)
+        results = json.loads(res.data)
+        self.assertEqual(results['message'], 'PLease enter a valid name')
 
     def test_api_can_get_all_expenses(self):
         """Test API can get a expense (GET request)."""
@@ -122,6 +219,7 @@ class TrackerTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         results = json.loads(res.data)
         self.assertEqual(results['items'][0]['name'], self.expense['name'])
+
 
     def test_GET_startdate(self):
         """Test API can get expenses from after start date (GET request)."""
@@ -198,8 +296,7 @@ class TrackerTestCase(unittest.TestCase):
         self.assertEqual(rv.status_code, 201)
         fetch = self.client().get('/expenses?name=soda', headers=dict(Authorization="Bearer " + access_token))
         result = json.loads(fetch.data)
-        print('Fetching soda')
-        print(result)
+
         consolidated_total = 212.23
         res = self.client().get('/monthly_report?month=01-2021', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)

@@ -1,4 +1,7 @@
 # Expense Tracker
+[![Coverage Status](https://coveralls.io/repos/github/JethroPowers/expense_tracker/badge.svg?branch=main)](https://coveralls.io/github/JethroPowers/expense_tracker?branch=main)
+[![Build Status](https://travis-ci.org/JethroPowers/expense_tracker.svg?branch=main)](https://travis-ci.org/JethroPowers/expense_tracker)
+
 The Expense tracker is python flask API that tracks the expenses of a user and is 
 able to generate monthly and yearly reports
 

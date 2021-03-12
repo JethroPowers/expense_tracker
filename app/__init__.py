@@ -335,6 +335,14 @@ def create_app(config_name):
                         response.status_code = 400
 
                         return response
+                else:
+                    response = jsonify({
+                        'message': f'Please enter a Month',
+                        'status': 'error'
+                    })
+                    response.status_code = 400
+
+                    return response
 
                 expenses = ExpenseTracker.query.with_entities(
                     func.sum(ExpenseTracker.amount_spent), ExpenseTracker.date_of_expense) \

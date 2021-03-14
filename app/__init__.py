@@ -211,7 +211,14 @@ def create_app(config_name):
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
-                #
+        else:
+            response = jsonify({
+                'message': f'Please enter an access code',
+                'status': 'error'
+            })
+            response.status_code = 400
+
+            return response
 
     @app.route('/expenses/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def expense_manipulation(id, **kwargs):
@@ -308,7 +315,14 @@ def create_app(config_name):
                     })
                     response.status_code = 200
                     return response
+        else:
+            response = jsonify({
+                'message': f'Please enter an accesscode',
+                'status': 'error'
+            })
+            response.status_code = 400
 
+            return response
     @app.route('/monthly_report', methods=['GET'])
     def month_expense():
         auth_header = request.headers.get('Authorization')
@@ -343,6 +357,7 @@ def create_app(config_name):
                     response.status_code = 400
 
                     return response
+
 
                 expenses = ExpenseTracker.query.with_entities(
                     func.sum(ExpenseTracker.amount_spent), ExpenseTracker.date_of_expense) \
@@ -406,6 +421,14 @@ def create_app(config_name):
                         response.status_code = 400
 
                         return response
+                else:
+                    response = jsonify({
+                        'message': f'Please enter a Year',
+                        'status': 'error'
+                    })
+                    response.status_code = 400
+
+                    return response
 
                 expenses = ExpenseTracker.query.with_entities(
                     func.sum(ExpenseTracker.amount_spent).label("total_amount"), extract('month', ExpenseTracker.date_of_expense), extract('year', ExpenseTracker.date_of_expense)) \

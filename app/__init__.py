@@ -216,14 +216,37 @@ def create_app(config_name):
                 'message': f'Please enter an access code',
                 'status': 'error'
             })
-            response.status_code = 400
+            response.status_code = 401
 
             return response
 
     @app.route('/expenses/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def expense_manipulation(id, **kwargs):
         auth_header = request.headers.get('Authorization')
+        if auth_header is None:
+            response = jsonify({
+                'message': f'Authorization header missing',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
+        if auth_header == '':
+            response = jsonify({
+                'message': f'Please insert Bearer token',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
+        access_token = auth_header.split(" ")
+        if len(access_token) < 2:
+            response = jsonify({
+                'message': f'Authorization token should start with keyword Bearer',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
         access_token = auth_header.split(" ")[1]
+
 
         if access_token:
             # Get the user id related to this access token
@@ -317,17 +340,38 @@ def create_app(config_name):
                     return response
         else:
             response = jsonify({
-                'message': f'Please enter an accesscode',
+                'message': f'Please enter an access token',
                 'status': 'error'
             })
-            response.status_code = 400
-
+            response.status_code = 401
             return response
+
     @app.route('/monthly_report', methods=['GET'])
     def month_expense():
         auth_header = request.headers.get('Authorization')
+        if auth_header is None:
+            response = jsonify({
+                'message': f'Authorization header missing',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
+        if auth_header == '':
+            response = jsonify({
+                'message': f'Please insert Bearer token',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
+        access_token = auth_header.split(" ")
+        if len(access_token) < 2:
+            response = jsonify({
+                'message': f'Authorization token should start with keyword Bearer',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
         access_token = auth_header.split(" ")[1]
-
         if access_token:
             # Get the user id related to this access token
             user_id = User.decode_token(access_token)
@@ -394,10 +438,41 @@ def create_app(config_name):
                     'items': results,
                     'consolidated_total': consolidated_total
                 })), 200
+        else:
+            response = jsonify({
+                'message': f'Please enter an access token',
+                'status': 'error'
+            })
+            response.status_code = 401
+
+            return response
 
     @app.route('/yearly_report', methods=['GET'])
     def year_expense():
         auth_header = request.headers.get('Authorization')
+        if auth_header is None:
+            response = jsonify({
+                'message': f'Authorization header missing',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
+        if auth_header == '':
+            response = jsonify({
+                'message': f'Please insert Bearer token',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
+        access_token = auth_header.split(" ")
+        if len(access_token) < 2:
+            response = jsonify({
+                'message': f'Authorization token should contain the keyword "Bearer" followed'
+                           f' by a space and then the access token',
+                'status': 'error'
+            })
+            response.status_code = 401
+            return response
         access_token = auth_header.split(" ")[1]
 
         if access_token:
@@ -452,6 +527,14 @@ def create_app(config_name):
                     'months': results,
                     'consolidated_total': consolidated_total
                 })), 200
+        else:
+            response = jsonify({
+                'message': f'Please enter an access token',
+                'status': 'error'
+            })
+            response.status_code = 401
+
+            return response
 
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)

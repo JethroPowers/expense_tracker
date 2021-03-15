@@ -5,6 +5,9 @@
 The Expense tracker is python flask API that tracks the expenses of a user and is 
 able to generate monthly and yearly reports
 
+## Documentation
+The documentation can be found at https://expensetracker.docs.apiary.io
+
 ## Pre-requisites
 * [Python 3.7](https://www.python.org/downloads/release/python-379/)
 * [Git](https://git-scm.com/downloads)
